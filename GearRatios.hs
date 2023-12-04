@@ -6,6 +6,15 @@ import Data.List
 import Data.List.GroupBy as G
 import System.IO
 
+
+main :: IO ()
+main = withFile "./data/gear_ratios" ReadMode $ \handle -> do
+  schematic <- liftM readSchematic (hGetContents handle)
+  let parts = filter (adjacent (symbols schematic)) (engineParts schematic)
+  print (sum $ map partNumber parts)
+  print (sum $ gearRatios schematic)
+
+-- Types
 data Point = Point {
   x :: Int,
   y :: Int
@@ -23,23 +32,16 @@ data Schematic = Schematic {
   symbols :: [Point]
 } deriving (Show, Read)
 
-
-main :: IO ()
-main = withFile "./data/gear_ratios" ReadMode $ \handle -> do
-  schematic <- liftM readSchematic (hGetContents handle)
-  let parts = filter (adjacent (symbols schematic)) (engineParts schematic)
-  print (sum $ map partNumber parts)
-  print (sum $ gearRatios schematic)
-
+-- Utility.
 
 gearRatios :: Schematic -> [Int]
 gearRatios schematic = map (product' . gears) (symbols schematic)
   where gears s = map partNumber $ filter (adjacent [s]) (engineParts schematic)
 
 
-product' s
-  | length s <= 1 = 0
-  | otherwise     = product s
+product' :: [Int] -> Int
+product' [x] = 0
+product' xs  = product xs
 
 
 adjacent :: [Point] -> EnginePart -> Bool
@@ -59,16 +61,8 @@ expandPoint p = map (+p) adjacentPoints
 
 
 adjacentPoints :: [Point]
-adjacentPoints = [ Point { x = 1    , y = 0    }
-                 , Point { x = (-1) , y = 0    }
-                 , Point { x = 0    , y = 1    }
-                 , Point { x = 0    , y = (-1) }
-                 , Point { x = 1    , y = 1    }
-                 , Point { x = 1    , y = (-1) }
-                 , Point { x = (-1) , y = 1    }
-                 , Point { x = (-1) , y = (-1) }
-                 ]
-
+adjacentPoints =  map toPoint [(i, j) | i <- directions, j <- directions]
+  where directions = [-1, 0, 1]
 
 readSchematic :: String -> Schematic
 readSchematic input = let rows = lines input
@@ -82,7 +76,7 @@ readSchematic input = let rows = lines input
 type Square = ((Int, Int), Char)
 type Grid = [Square]
 
-toGrid :: Int -> Int -> String -> [((Int, Int), Char)]
+toGrid :: Int -> Int -> String -> Grid
 toGrid w h = zip [(j, i) | i <- [0..(w - 1)], j <- [0..(h - 1)]]
 
 readEngineParts :: Grid -> [EnginePart]
@@ -109,4 +103,3 @@ instance Num Point where
   (+) p q = Point { x = (x p) + (x q)
                   , y = (y p) + (y q)
                   }
-
