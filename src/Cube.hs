@@ -1,4 +1,4 @@
-module Cube where
+module Cube (main) where
 
 import Control.Monad
 import Data.Char

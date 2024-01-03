@@ -28,7 +28,7 @@ totalNumberOfCards points = countBonusCards (zip (repeat 1) points)
 
 countBonusCards :: [(Int, Int)] -> Int
 countBonusCards []     = 0
-countBonusCards (x:xs) = n + go (applyN w acc xs)
+countBonusCards (x:xs) = error "UNIMPLEMENTED" -- n + go (applyN w acc xs)
   where n = fst x  -- number of copies (including original) of current card
         w = snd x  -- number of winning matchs on current card.
         acc = (+ (fst x)) *** id -- add bonus copies onto first value of tuple

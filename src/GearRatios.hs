@@ -61,7 +61,7 @@ expandPoint p = map (+p) adjacentPoints
 
 
 adjacentPoints :: [Point]
-adjacentPoints =  map toPoint [(i, j) | i <- directions, j <- directions]
+adjacentPoints =  [toPoint (i, j) | i <- directions, j <- directions]
   where directions = [-1, 0, 1]
 
 readSchematic :: String -> Schematic
@@ -103,3 +103,4 @@ instance Num Point where
   (+) p q = Point { x = (x p) + (x q)
                   , y = (y p) + (y q)
                   }
+
